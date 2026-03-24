@@ -25,6 +25,20 @@ Integrates directly with the AWS CloudWatch API using `@aws-sdk/client-cloudwatc
 * Monitors `CPUUtilization` for the RDS instance.
 * Compares `ClientConnections` against `DatabaseConnections` on the RDS Proxy to visualize connection pooling in action.
 
+## Getting Started (Running the UI)
+
+To run this application locally:
+
+1. Install the project dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the development server (this runs both the React frontend and the Node.js backend):
+   ```bash
+   npm run dev
+   ```
+3. Open your browser to `http://localhost:3000`.
+
 ## How to Use
 
 ### Step 1: Deploy Infrastructure
