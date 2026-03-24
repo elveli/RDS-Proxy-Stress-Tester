@@ -154,7 +154,7 @@ resource "aws_db_instance" "default" {
   identifier             = "stress-test-db"
   allocated_storage      = 20
   engine                 = "postgres"
-  engine_version         = "15.4"
+  engine_version         = "15" # AWS will automatically pick the latest available minor version
   instance_class         = "db.t4g.micro" # Very cheap ARM instance
   db_name                = var.db_name
   username               = var.db_username
