@@ -54,6 +54,9 @@ async function startServer() {
             successfulQueries++;
           } catch (err) {
             failedQueries++;
+            if (failedQueries === 1) {
+              console.error('First query failure:', err);
+            }
             // Small delay to prevent tight loop on failure
             await new Promise(resolve => setTimeout(resolve, 100));
           }
