@@ -283,6 +283,22 @@ resource "aws_db_proxy_target" "default" {
 # ------------------------------------------------------------------------------
 # EC2 Spot Instance (For Stress Testing)
 # ------------------------------------------------------------------------------
+resource "tls_private_key" "ec2_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "ec2_key_pair" {
+  key_name   = "rds-stress-test-key"
+  public_key = tls_private_key.ec2_key.public_key_openssh
+}
+
+resource "local_file" "private_key" {
+  content         = tls_private_key.ec2_key.private_key_pem
+  filename        = "${path.module}/stress-test-key.pem"
+  file_permission = "0400"
+}
+
 data "aws_ami" "amazon_linux_2023" {
   most_recent = true
   owners      = ["amazon"]
@@ -302,8 +318,7 @@ resource "aws_spot_instance_request" "stress_test_worker" {
   wait_for_fulfillment           = true
   associate_public_ip_address    = true
 
-  # Optional: Add your key name here to SSH into the instance
-  # key_name = "my-key-pair"
+  key_name = aws_key_pair.ec2_key_pair.key_name
 
   user_data = <<-EOF
               #!/bin/bash

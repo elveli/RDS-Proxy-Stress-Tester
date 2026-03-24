@@ -12,6 +12,7 @@ Provides ready-to-deploy Terraform code that provisions:
 * An RDS Proxy configured for connection pooling.
 * Secure, production-grade credentials using AWS Secrets Manager (a random password is automatically generated).
 * An EC2 Spot instance (`t3.micro`) to act as a bastion host/worker.
+* An automatically generated SSH key pair (saved locally as `stress-test-key.pem`) to securely access the EC2 instance.
 * All necessary VPC networking, Security Groups, IAM Roles, and Secrets Manager configurations.
 
 ### 2. Real Stress Testing
