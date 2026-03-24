@@ -150,6 +150,16 @@ resource "aws_security_group" "rds_sg" {
 # ------------------------------------------------------------------------------
 # RDS Instance (Low End / Burstable)
 # ------------------------------------------------------------------------------
+resource "aws_db_parameter_group" "postgres15_no_ssl" {
+  name   = "stress-test-postgres15-no-ssl"
+  family = "postgres15"
+
+  parameter {
+    name  = "rds.force_ssl"
+    value = "0"
+  }
+}
+
 resource "aws_db_instance" "default" {
   identifier             = "stress-test-db"
   allocated_storage      = 20
@@ -159,7 +169,7 @@ resource "aws_db_instance" "default" {
   db_name                = var.db_name
   username               = var.db_username
   password               = random_password.db_password.result
-  parameter_group_name   = "default.postgres15"
+  parameter_group_name   = aws_db_parameter_group.postgres15_no_ssl.name
   skip_final_snapshot    = true
   db_subnet_group_name   = aws_db_subnet_group.default.name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
