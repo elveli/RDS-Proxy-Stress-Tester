@@ -1,4 +1,4 @@
-export const terraformCode = `provider "aws" {
+provider "aws" {
   region = "us-east-1"
 }
 
@@ -332,4 +332,3 @@ output "rds_proxy_endpoint" {
 output "ec2_public_ip" {
   value = aws_spot_instance_request.stress_test_worker.public_ip
 }
-`;

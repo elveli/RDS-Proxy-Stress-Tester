@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
-import { terraformCode } from '../terraform/main.tf';
+import terraformCode from '../../terraform/main.tf?raw';
 
 export default function TerraformView() {
   const [copied, setCopied] = useState(false);
