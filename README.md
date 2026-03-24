@@ -26,6 +26,23 @@ Integrates directly with the AWS CloudWatch API using `@aws-sdk/client-cloudwatc
 * Monitors `CPUUtilization` for the RDS instance.
 * Compares `ClientConnections` against `DatabaseConnections` on the RDS Proxy to visualize connection pooling in action.
 
+## Cost Estimation
+
+This infrastructure is designed to be as low-cost as possible while still demonstrating real RDS Proxy connection pooling. Below is an estimated cost breakdown for running this setup in `us-east-1` (N. Virginia).
+
+**Estimated Hourly Cost: ~$0.06 / hour**
+**Estimated 24-Hour Cost: ~$1.30 / day**
+
+### Breakdown of Costs
+* **RDS Instance (`db.t4g.micro`)**: ~$0.016 / hour
+* **RDS Storage (20 GB)**: ~$0.003 / hour (~$2.30 / month)
+* **RDS Proxy**: ~$0.030 / hour (Priced per underlying DB vCPU. `db.t4g.micro` has 2 vCPUs at ~$0.015 per vCPU-hour)
+* **EC2 Spot Instance (`t3.micro`)**: ~$0.004 / hour (Spot pricing varies, but is capped at $0.01 in the Terraform config)
+* **AWS Secrets Manager**: ~$0.001 / hour ($0.40 per secret / month)
+* **Data Transfer & CloudWatch**: Negligible for 15 minutes of light stress testing per day.
+
+*Note: While the `db.t4g.micro` instance may fall under the AWS Free Tier for new accounts, **RDS Proxy does not have a free tier** and will incur charges as long as it is provisioned. Remember to run `terraform destroy` when you are finished testing to avoid unexpected charges.*
+
 ## Getting Started (Running the UI)
 
 To run this application locally:
