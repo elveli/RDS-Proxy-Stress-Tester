@@ -11,17 +11,19 @@ variable "db_username" {
   default     = "postgres"
 }
 
-variable "db_password" {
-  description = "Database master password"
-  type        = string
-  sensitive   = true
-  default     = "SuperSecretPassword123!" # Change this in production
-}
-
 variable "db_name" {
   description = "Database name"
   type        = string
   default     = "stresstestdb"
+}
+
+# ------------------------------------------------------------------------------
+# Random Password Generation
+# ------------------------------------------------------------------------------
+resource "random_password" "db_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
 # ------------------------------------------------------------------------------
@@ -156,7 +158,7 @@ resource "aws_db_instance" "default" {
   instance_class         = "db.t4g.micro" # Very cheap ARM instance
   db_name                = var.db_name
   username               = var.db_username
-  password               = var.db_password
+  password               = random_password.db_password.result
   parameter_group_name   = "default.postgres15"
   skip_final_snapshot    = true
   db_subnet_group_name   = aws_db_subnet_group.default.name
@@ -200,7 +202,7 @@ resource "aws_secretsmanager_secret_version" "db_credentials" {
   secret_id     = aws_secretsmanager_secret.db_credentials.id
   secret_string = jsonencode({
     username = var.db_username
-    password = var.db_password
+    password = random_password.db_password.result
   })
 }
 

@@ -10,6 +10,7 @@ This application provides a complete, end-to-end solution for provisioning, stre
 Provides ready-to-deploy Terraform code that provisions:
 * A low-cost `db.t4g.micro` PostgreSQL instance.
 * An RDS Proxy configured for connection pooling.
+* Secure, production-grade credentials using AWS Secrets Manager (a random password is automatically generated).
 * An EC2 Spot instance (`t3.micro`) to act as a bastion host/worker.
 * All necessary VPC networking, Security Groups, IAM Roles, and Secrets Manager configurations.
 
