@@ -65,9 +65,18 @@ To run this application locally:
 2. Save it as `main.tf` and run `terraform init` followed by `terraform apply`.
 3. Note the outputs for `rds_proxy_endpoint` and `ec2_public_ip`.
 
-### Step 2: Set Up SSH Tunnel
-RDS Proxy is strictly VPC-only and cannot be accessed directly from the public internet. To run the stress test from your local machine (or this web app running locally), you must tunnel through the EC2 Spot instance:
+### Step 2: Set Up Tunnel to the Bastion
+RDS Proxy is strictly VPC-only and cannot be accessed directly from the public internet. To run the stress test from your local machine (or this web app running locally), you must tunnel through the EC2 Spot instance. 
 
+After you run `terraform apply`, you will receive the outputs `bastion_instance_id` and `ec2_public_ip`.
+
+**Method A: AWS Systems Manager (SSM) - No SSH Key Required (Recommended)**
+Use the AWS CLI to start a secure SSM session into the Bastion, which maps your local port 5432 to the RDS Proxy endpoint.
+```bash
+aws ssm start-session --target <BASTION_INSTANCE_ID> --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters '{"portNumber":["5432"],"localPortNumber":["5432"],"host":["<rds_proxy_endpoint>"]}'
+```
+
+**Method B: Traditional SSH Key Tunnel**
 ```bash
 ssh -i /path/to/your-key.pem -N -L 5432:<rds_proxy_endpoint>:5432 ec2-user@<ec2_public_ip>
 ```

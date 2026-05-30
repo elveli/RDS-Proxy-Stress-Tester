@@ -293,6 +293,32 @@ resource "aws_db_proxy_target" "default" {
 # ------------------------------------------------------------------------------
 # EC2 Spot Instance (For Stress Testing)
 # ------------------------------------------------------------------------------
+resource "aws_iam_role" "ec2_ssm_role" {
+  name = "ec2-ssm-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_ssm_attach" {
+  role       = aws_iam_role.ec2_ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ec2_ssm_profile" {
+  name = "ec2-ssm-profile"
+  role = aws_iam_role.ec2_ssm_role.name
+}
+
 resource "tls_private_key" "ec2_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -325,6 +351,7 @@ resource "aws_spot_instance_request" "stress_test_worker" {
   instance_type                  = "t3.micro"
   subnet_id                      = aws_subnet.public_1.id
   vpc_security_group_ids         = [aws_security_group.ec2_sg.id]
+  iam_instance_profile           = aws_iam_instance_profile.ec2_ssm_profile.name
   wait_for_fulfillment           = true
   associate_public_ip_address    = true
 
@@ -358,4 +385,8 @@ output "rds_proxy_endpoint" {
 
 output "ec2_public_ip" {
   value = aws_spot_instance_request.stress_test_worker.public_ip
+}
+
+output "bastion_instance_id" {
+  value = aws_spot_instance_request.stress_test_worker.spot_instance_id
 }
