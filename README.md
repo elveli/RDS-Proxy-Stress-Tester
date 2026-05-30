@@ -68,10 +68,16 @@ To run this application locally:
 ### Step 2: Retrieve your Database Password
 Before connecting to the database, retrieve the auto-generated password securely from AWS Secrets Manager using the AWS CLI. Replace the ARN with the one printed in the Terraform outputs (`db_password_secret_arn`):
 
+**Mac/Linux (using Python):**
+```bash
+aws secretsmanager get-secret-value --secret-id <YOUR_SECRET_ARN> --query SecretString --output text | python3 -c "import sys, json; print(json.load(sys.stdin)['password'])"
+```
+
+**If you prefer to manually copy it:**
 ```bash
 aws secretsmanager get-secret-value --secret-id <YOUR_SECRET_ARN> --query SecretString --output text
 ```
-*(Note: Because of RDS Proxy, the secret is now stored as a JSON object. You will see `{"username":"dbadmin","password":"..."}`. Copy the password from inside the JSON!)*
+*(Note: Be extremely careful to copy ONLY the password string from the JSON output. **Do not** include the surrounding `"` quotes or any trailing spaces!)*
 
 ### Step 3: Set Up Tunnel to the Bastion
 RDS Proxy is strictly VPC-only and cannot be accessed directly from the public internet. To run the stress test from your local machine (or this web app running locally), you must tunnel through the EC2 Spot instance. 
