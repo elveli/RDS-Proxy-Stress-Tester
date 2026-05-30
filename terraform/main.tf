@@ -390,3 +390,7 @@ output "ec2_public_ip" {
 output "bastion_instance_id" {
   value = aws_spot_instance_request.stress_test_worker.spot_instance_id
 }
+
+output "db_password_secret_arn" {
+  value = aws_secretsmanager_secret.db_credentials.arn
+}

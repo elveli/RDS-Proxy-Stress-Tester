@@ -52,11 +52,11 @@ export default function TerraformView() {
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-sm">
           <h3 className="text-lg font-medium text-white mb-3">Testing from your laptop</h3>
           <p className="text-sm text-slate-400 mb-3">
-            RDS Proxy is VPC-only and cannot be made public. To stress test from your laptop, you must use SSH port forwarding through the EC2 Spot instance:
+            RDS Proxy is VPC-only and cannot be made public. To stress test from your laptop, use AWS SSM to securely port forward through your Bastion EC2 instance:
           </p>
           <div className="bg-slate-950 p-3 rounded border border-slate-800 overflow-x-auto">
             <code className="text-xs text-emerald-400 whitespace-nowrap">
-              ssh -i your-key.pem -N -L 5432:&lt;rds_proxy_endpoint&gt;:5432 ec2-user@&lt;ec2_public_ip&gt;
+              aws ssm start-session --target &lt;BASTION_INSTANCE_ID&gt; --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters '{'{"portNumber":["5432"],"localPortNumber":["5432"],"host":["<rds_proxy_endpoint>"]}'}'
             </code>
           </div>
           <p className="text-sm text-slate-400 mt-3">

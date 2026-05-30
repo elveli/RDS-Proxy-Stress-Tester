@@ -65,7 +65,15 @@ To run this application locally:
 2. Save it as `main.tf` and run `terraform init` followed by `terraform apply`.
 3. Note the outputs for `rds_proxy_endpoint` and `ec2_public_ip`.
 
-### Step 2: Set Up Tunnel to the Bastion
+### Step 2: Retrieve your Database Password
+Before connecting to the database, retrieve the auto-generated password securely from AWS Secrets Manager using the AWS CLI. Replace the ARN with the one printed in the Terraform outputs (`db_password_secret_arn`):
+
+```bash
+aws secretsmanager get-secret-value --secret-id <YOUR_SECRET_ARN> --query SecretString --output text
+```
+*(Note: Because of RDS Proxy, the secret is now stored as a JSON object. You will see `{"username":"dbadmin","password":"..."}`. Copy the password from inside the JSON!)*
+
+### Step 3: Set Up Tunnel to the Bastion
 RDS Proxy is strictly VPC-only and cannot be accessed directly from the public internet. To run the stress test from your local machine (or this web app running locally), you must tunnel through the EC2 Spot instance. 
 
 After you run `terraform apply`, you will receive the outputs `bastion_instance_id` and `ec2_public_ip`.
@@ -81,13 +89,13 @@ aws ssm start-session --target <BASTION_INSTANCE_ID> --document-name AWS-StartPo
 ssh -i /path/to/your-key.pem -N -L 5432:<rds_proxy_endpoint>:5432 ec2-user@<ec2_public_ip>
 ```
 
-### Step 3: Run the Stress Test
+### Step 4: Run the Stress Test
 1. Navigate to the **Stress Test** tab.
 2. Set the Host to `localhost` (which routes through your SSH tunnel to the proxy).
 3. Configure your concurrent connections and duration.
 4. Click **Start Stress Test** to begin hammering the database.
 
-### Step 4: Monitor Metrics
+### Step 5: Monitor Metrics
 1. Navigate to the **CloudWatch Metrics** tab.
 2. Enter your AWS Region, RDS Instance ID, RDS Proxy Name, and AWS Credentials.
 3. Click **Fetch** to pull the latest metrics.
